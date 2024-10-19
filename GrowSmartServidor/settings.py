@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'plants',
-    'rest_framework'
+    'rest_framework',
+    'users',
+    'smartpots'
 ]
 
 MIDDLEWARE = [
