@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Configurations,SensorsData,SmartPot,WateringEvent
-
-#Serializador del modelo de Plants
+from plants.serializers import PlantSerializer
+#Serializador de los modelos
 class ConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model=Configurations
@@ -19,6 +19,7 @@ class ConfigurationSerializer(serializers.ModelSerializer):
         )
 
 class SmartPotSerializer(serializers.ModelSerializer):
+    plant=PlantSerializer()
     class Meta:
         model=SmartPot
         fields=(
@@ -26,9 +27,9 @@ class SmartPotSerializer(serializers.ModelSerializer):
             'pot_name',
             'ubication',
             'updated_at',
-            'user_profile',
             'plant'
         )
+        
 
 class WateringEventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,3 +53,14 @@ class SensorsDataSerializer(serializers.ModelSerializer):
             'registed_at',
             'smart_pot'
         )
+
+#Modelos para las operaciones con los modelos
+class SmartPotCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SmartPot
+        fields = ['pot_name', 'ubication', 'updated_at', 'plant']
+        extra_kwargs = {'plant': {'write_only': True}}  # El ID de la planta se envía en la creación
+
+    def to_representation(self, instance):
+        # Usamos el `SmartPotSerializer` para la representación final
+        return SmartPotSerializer(instance).data
