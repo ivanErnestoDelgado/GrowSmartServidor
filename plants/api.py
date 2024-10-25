@@ -4,5 +4,5 @@ from .serializers import PlantSerializer
 
 class PlantViewSet(viewsets.ModelViewSet):
     queryset= Plant.objects.all()
-    permission_classes=[permissions.AllowAny]
+    permission_classes=[permissions.IsAuthenticated]
     serializer_class=PlantSerializer
