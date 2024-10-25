@@ -8,14 +8,15 @@ class PlantSerializer(serializers.ModelSerializer):
         fields=(
             'id',
             'name',
-            'scientific_name',
-            'description',
-            'ideal_temperature',
-            'ideal_humidity',
-            'sunlight_needs',
-            'watering_frequency',
+            'maximun_temperature',
+            'minimun_temperature',
+            'maximun_humidity',
+            'minumun_humidity',
+            'maximun_ligth_level',
+            'minimun_ligth_level',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'plant_cares'
         )
         read_only_fields=('created_at',)
 

@@ -1,6 +1,6 @@
 from django.db import models
-from ..plants.models import Plant
-from ..users.models import UserProfile
+from plants.models import Plant
+from users.models import UserProfile
 
 # Create your models here.
 
