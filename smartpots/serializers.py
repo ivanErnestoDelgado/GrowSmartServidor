@@ -13,9 +13,7 @@ class ConfigurationSerializer(serializers.ModelSerializer):
             'minumun_humidity',
             'maximun_ligth_level',
             'minimun_ligth_level',
-            'notifications_is_activated',
-            'smartpot',
-            'plant'
+            'notifications_is_activated'
         )
 
 class SmartPotSerializer(serializers.ModelSerializer):
@@ -37,8 +35,7 @@ class WateringEventSerializer(serializers.ModelSerializer):
         fields=(
             'id',
             'water_amount',
-            'watering_date',
-            'smart_pot'
+            'watering_date'
         )
 
 class SensorsDataSerializer(serializers.ModelSerializer):

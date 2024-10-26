@@ -1,9 +1,10 @@
-from rest_framework import generics
+from rest_framework import generics,status
 from rest_framework.permissions import IsAuthenticated
-from .models import SmartPot,SensorsData
-from .serializers import SmartPotCreateSerializer,SmartPotSerializer,SensorsDataSerializer
+from .models import *
+from .serializers import SmartPotCreateSerializer,SmartPotSerializer,SensorsDataSerializer,ConfigurationSerializer,WateringEventSerializer
 from users.models import UserProfile
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 
 class SmartPotCreateView(generics.CreateAPIView):
     serializer_class = SmartPotCreateSerializer
@@ -49,3 +50,60 @@ class SensorsDataCreateView(generics.CreateAPIView):
         smart_pot_id = self.kwargs['pk']
         smart_pot = SmartPot.objects.get(id=smart_pot_id, user_profile=UserProfile.objects.get(user=self.request.user))  # Verifica que la maceta pertenezca al usuario
         serializer.save(smart_pot=smart_pot)
+
+class SmartPotConfigurationsView(generics.GenericAPIView):
+    serializer_class = ConfigurationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        smart_pot_id = self.kwargs['pk']
+        # Verifica que el usuario sea el dueño de la maceta
+        configurations = Configurations.objects.filter(smartpot__id=smart_pot_id, smartpot__user_profile=UserProfile.objects.get(user=self.request.user)).first()
+        if not configurations:
+            raise PermissionDenied("No tienes permiso para acceder a esta configuración.")
+        return configurations
+
+    def get(self, request, pk):
+        # Intenta obtener las configuraciones de la maceta
+        configurations = Configurations.objects.filter(smartpot__id=pk, smartpot__user_profile=UserProfile.objects.get(user=request.user)).first()
+        if configurations:
+            serializer = self.get_serializer(configurations)
+            return Response(serializer.data)
+        else:
+            # Devuelve un mensaje indicando que no hay configuraciones aún
+            return Response({"detail": "Configuraciones no encontradas. Puedes crearlas usando PUT."}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        # Verifica si ya existen configuraciones para esta maceta
+        configurations = Configurations.objects.filter(smartpot__id=pk, smartpot__user_profile=UserProfile.objects.get(user=request.user)).first()
+        if configurations:
+            # Si existen, actualiza las configuraciones
+            serializer = self.get_serializer(configurations, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            # Si no existen, crea nuevas configuraciones asociadas a la maceta
+            smart_pot = SmartPot.objects.get(id=pk, user_profile=UserProfile.objects.get(user=self.request.user))
+            associated_plant=smart_pot.plant
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(smartpot=smart_pot,plant=associated_plant)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+class WateringEventCreateView(generics.CreateAPIView):
+    serializer_class = WateringEventSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        smart_pot_id = self.kwargs['pk']
+        smart_pot = SmartPot.objects.get(id=smart_pot_id, user_profile=UserProfile.objects.get(user=self.request.user))  # Verifica que la maceta pertenezca al usuario
+        serializer.save(smart_pot=smart_pot)
+
+class WateringEventListView(generics.ListAPIView):
+    serializer_class = WateringEventSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        smart_pot_id = self.kwargs['pk']
+        return WateringEvent.objects.filter(smart_pot__id=smart_pot_id, smart_pot__user_profile=UserProfile.objects.get(user=self.request.user))
