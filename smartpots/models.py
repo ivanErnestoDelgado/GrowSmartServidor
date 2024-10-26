@@ -23,7 +23,7 @@ class WateringEvent(models.Model):
 class SensorsData(models.Model):
    floor_humidity=models.DecimalField(max_digits=5, decimal_places=2)
    temperature=models.PositiveIntegerField()
-   ligth_level=models.PositiveIntegerField()
+   light_level=models.PositiveIntegerField()
    water_level=models.PositiveIntegerField()
    registed_at=models.DateTimeField(auto_now=True)
    smart_pot=models.ForeignKey(SmartPot, related_name='SensorsData', on_delete=models.CASCADE)
