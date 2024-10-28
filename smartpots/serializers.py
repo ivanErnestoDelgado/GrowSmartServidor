@@ -57,7 +57,12 @@ class SensorsDataSerializer(serializers.ModelSerializer):
 class SmartPotCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SmartPot
-        fields = ['pot_name', 'ubication', 'updated_at', 'plant']
+        fields = ['pot_name',
+                    'ubication',
+                    'updated_at',
+                    'size',
+                    'status',
+                    'plant']
         extra_kwargs = {'plant': {'write_only': True}}  # El ID de la planta se envía en la creación
 
     def to_representation(self, instance):
