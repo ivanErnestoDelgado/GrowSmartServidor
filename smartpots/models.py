@@ -8,6 +8,8 @@ class SmartPot(models.Model):
     pot_name=models.CharField(max_length=100)
     ubication=models.CharField(max_length=100)
     updated_at=models.DateTimeField(auto_now=True)
+    size=models.CharField(max_length=40)
+    status=models.PositiveSmallIntegerField()
     user_profile= models.ForeignKey(UserProfile, related_name='smartpots', on_delete=models.CASCADE)
     plant = models.ForeignKey(Plant, related_name='smartpots', on_delete=models.CASCADE)
 

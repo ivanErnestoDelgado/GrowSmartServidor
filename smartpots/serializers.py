@@ -25,6 +25,8 @@ class SmartPotSerializer(serializers.ModelSerializer):
             'pot_name',
             'ubication',
             'updated_at',
+            'size',
+            'status',
             'plant'
         )
         
