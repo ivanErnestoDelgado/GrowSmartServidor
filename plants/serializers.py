@@ -20,3 +20,7 @@ class PlantSerializer(serializers.ModelSerializer):
         )
         read_only_fields=('created_at',)
 
+class PlantCareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plant
+        fields = ['id', 'name', 'plant_cares']
