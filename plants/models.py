@@ -10,8 +10,22 @@ class Plant(models.Model):
     minimun_ligth_level=models.PositiveIntegerField()   # Nivel de humedad minimo
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    plant_cares=models.TextField()
     def __str__(self):
         return self.name
 
-#ACTUALIZAR EL SERIALIZER DESPUES
+
+class PlantRecomendation(models.Model):
+    class RecommendationType(models.TextChoices):
+        POSITIVE = 'positive', 'Positive'
+        NEGATIVE = 'negative', 'Negative'
+
+    
+    type = models.CharField(
+        max_length=8,
+        choices=RecommendationType.choices,
+        default=RecommendationType.POSITIVE
+    )
+    recommendation = models.CharField(max_length=255)
+    plant = models.ForeignKey(Plant, related_name='recommendations', on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.type} - {self.recommendation}"  # Muestra el tipo y los primeros caracteres de la recomendación

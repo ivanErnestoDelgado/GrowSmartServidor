@@ -9,8 +9,8 @@ class PlantView(generics.RetrieveAPIView):
     serializer_class=PlantSerializer
 
 
-class PlantCareView(generics.RetrieveAPIView):
+class PlantDetailWithRecommendationsView(generics.RetrieveAPIView):
     queryset = Plant.objects.all()
-    serializer_class = PlantCareSerializer
+    serializer_class = PlantWithRecommendationsSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'

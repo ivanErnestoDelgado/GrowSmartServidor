@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Plant
+from .models import *
 
 #Serializador del modelo de Plants
 class PlantSerializer(serializers.ModelSerializer):
@@ -15,12 +15,21 @@ class PlantSerializer(serializers.ModelSerializer):
             'maximun_ligth_level',
             'minimun_ligth_level',
             'created_at',
-            'updated_at',
-            'plant_cares'
+            'updated_at'
         )
         read_only_fields=('created_at',)
 
-class PlantCareSerializer(serializers.ModelSerializer):
+
+class PlantRecommendationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=PlantRecomendation
+        fields=(
+            'type',
+            'recommendation'
+        )
+
+class PlantWithRecommendationsSerializer(serializers.ModelSerializer):
+    recommendations = PlantRecommendationSerializer(many=True, read_only=True)
     class Meta:
         model = Plant
-        fields = ['id', 'name', 'plant_cares']
+        fields = ['id', 'name', 'recommendations']
