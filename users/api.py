@@ -1,7 +1,10 @@
-from rest_framework import generics
-from .serializers import RegisterSerializer
+from rest_framework import generics,status
+from .serializers import RegisterSerializer,UserSerializer
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -14,3 +17,24 @@ class RegisterView(generics.CreateAPIView):
             "user": serializer.data,
             "message": "Usuario registrado correctamente"
         }, status=status.HTTP_201_CREATED)
+
+class CustomAuthToken(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            # Obtiene o crea el token
+            token, created = Token.objects.get_or_create(user=user)
+            # Serializa los datos del usuario y su perfil
+            user_data = UserSerializer(user).data
+            # Agrega el token a la respuesta
+            return Response({
+                'token': token.key,
+                'user': user_data
+            })
+        else:
+            return Response({"error": "Credenciales inválidas"}, status=status.HTTP_400_BAD_REQUEST)

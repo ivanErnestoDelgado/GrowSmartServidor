@@ -1,4 +1,4 @@
-from rest_framework import viewsets,permissions,generics
+from rest_framework import permissions,generics
 from .models import Plant
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated
