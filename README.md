@@ -10,12 +10,12 @@ python version: 3.12.5
 
 instalación del proyecto:
 
-    Ejecuta este comado en powershell mientras estas posicionado en un directorio pertinente:
-        git clone https://github.com/ivanErnestoDelgado/GrowSmartServidor.git
+Ejecuta este comado en powershell mientras estas posicionado en un directorio pertinente:
+    git clone https://github.com/ivanErnestoDelgado/GrowSmartServidor.git
 
-    instalacion de dependencias:
-        cd GrowSmartServidor
-        pip install -r requirements.txt
+instalacion de dependencias:
+    cd GrowSmartServidor
+    pip install -r requirements.txt
 
 Uso:
     Para iniciar el servidor:
