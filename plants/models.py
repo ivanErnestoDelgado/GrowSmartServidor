@@ -7,7 +7,7 @@ class Plant(models.Model):
     maximun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad maximo
     minumun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad minimo
     maximun_ligth_level=models.PositiveIntegerField() # Nivel de luz maximo
-    minimun_ligth_level=models.PositiveIntegerField()   # Nivel de humedad minimo
+    minimun_ligth_level=models.PositiveIntegerField()   # Nivel de luz minimo
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
