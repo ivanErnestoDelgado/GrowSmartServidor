@@ -5,11 +5,23 @@ from users.models import UserProfile
 # Create your models here.
 
 class SmartPot(models.Model):
+    INACTIVE = 0
+    GOOD = 1
+    WARNING = 2
+    DANGER = 3
+
+    STATUS_CHOICES = [
+        (INACTIVE, 'Inactivo'),
+        (GOOD, 'Bueno'),
+        (WARNING, 'Advertencia'),
+        (DANGER, 'En peligro')
+    ]
+    serial_number=models.CharField(max_length=50)
     pot_name=models.CharField(max_length=100)
     ubication=models.CharField(max_length=100)
     updated_at=models.DateTimeField(auto_now=True)
     size=models.CharField(max_length=40)
-    status=models.PositiveSmallIntegerField()
+    status=models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=INACTIVE)
     user_profile= models.ForeignKey(UserProfile, related_name='smartpots', on_delete=models.CASCADE)
     plant = models.ForeignKey(Plant, related_name='smartpots', on_delete=models.CASCADE)
 

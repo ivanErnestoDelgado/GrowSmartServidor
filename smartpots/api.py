@@ -40,7 +40,9 @@ class SensorsDataListView(generics.ListAPIView):
     def get_queryset(self):
         smart_pot_id = self.kwargs['pk']
         # Filtra los datos de sensores solo para la maceta especificada y el usuario autenticado
-        return SensorsData.objects.filter(smart_pot__id=smart_pot_id, smart_pot__user_profile=UserProfile.objects.get(user=self.request.user))
+        return SensorsData.objects.filter(smart_pot__id=smart_pot_id, 
+                                          smart_pot__user_profile=UserProfile.objects.get
+                                          (user=self.request.user))
     
 class SensorsDataCreateView(generics.CreateAPIView):
     serializer_class = SensorsDataSerializer
@@ -49,7 +51,37 @@ class SensorsDataCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         smart_pot_id = self.kwargs['pk']
         smart_pot = SmartPot.objects.get(id=smart_pot_id, user_profile=UserProfile.objects.get(user=self.request.user))  # Verifica que la maceta pertenezca al usuario
-        serializer.save(smart_pot=smart_pot)
+        sensor_data=serializer.save(smart_pot=smart_pot)
+
+        smart_pot = sensor_data.smart_pot
+        plant = smart_pot.plant
+
+        # Verificar cada parámetro comparándolo con los límites de la planta
+        fuera_de_limites = 0
+        
+        # Verifica la temperatura
+        if sensor_data.temperature < plant.minimun_temperature or sensor_data.temperature > plant.maximun_temperature:
+            fuera_de_limites += 1
+        
+        # Verifica la humedad
+        if sensor_data.floor_humidity < plant.minumun_humidity or sensor_data.floor_humidity > plant.maximun_humidity:
+            fuera_de_limites += 1
+        
+        # Verifica el nivel de luz
+        if sensor_data.light_level < plant.minimun_ligth_level or sensor_data.light_level > plant.maximun_ligth_level:
+            fuera_de_limites += 1
+
+        # Actualiza el estado de la maceta basado en el número de parámetros fuera de los límites
+        if fuera_de_limites == 0:
+            smart_pot.status = SmartPot.GOOD
+        elif fuera_de_limites == 1:
+            smart_pot.status = SmartPot.WARNING
+        else:
+            smart_pot.status = SmartPot.DANGER
+
+        smart_pot.save()
+
+        
 
 class SmartPotConfigurationsView(generics.GenericAPIView):
     serializer_class = ConfigurationSerializer
@@ -58,14 +90,16 @@ class SmartPotConfigurationsView(generics.GenericAPIView):
     def get_object(self):
         smart_pot_id = self.kwargs['pk']
         # Verifica que el usuario sea el dueño de la maceta
-        configurations = Configurations.objects.filter(smartpot__id=smart_pot_id, smartpot__user_profile=UserProfile.objects.get(user=self.request.user)).first()
+        configurations = Configurations.objects.filter(smartpot__id=smart_pot_id, smartpot__user_profile=
+                                                       UserProfile.objects.get(user=self.request.user)).first()
         if not configurations:
             raise PermissionDenied("No tienes permiso para acceder a esta configuración.")
         return configurations
 
     def get(self, request, pk):
         # Intenta obtener las configuraciones de la maceta
-        configurations = Configurations.objects.filter(smartpot__id=pk, smartpot__user_profile=UserProfile.objects.get(user=request.user)).first()
+        configurations = Configurations.objects.filter(smartpot__id=pk, smartpot__user_profile=
+                                                       UserProfile.objects.get(user=request.user)).first()
         if configurations:
             serializer = self.get_serializer(configurations)
             return Response(serializer.data)
@@ -75,7 +109,8 @@ class SmartPotConfigurationsView(generics.GenericAPIView):
 
     def put(self, request, pk):
         # Verifica si ya existen configuraciones para esta maceta
-        configurations = Configurations.objects.filter(smartpot__id=pk, smartpot__user_profile=UserProfile.objects.get(user=request.user)).first()
+        configurations = Configurations.objects.filter(smartpot__id=pk, smartpot__user_profile=
+                                                       UserProfile.objects.get(user=request.user)).first()
         if configurations:
             # Si existen, actualiza las configuraciones
             serializer = self.get_serializer(configurations, data=request.data, partial=True)

@@ -22,6 +22,7 @@ class SmartPotSerializer(serializers.ModelSerializer):
         model=SmartPot
         fields=(
             'id',
+            'serial_number',
             'pot_name',
             'ubication',
             'updated_at',
@@ -49,19 +50,18 @@ class SensorsDataSerializer(serializers.ModelSerializer):
             'temperature',
             'light_level',
             'water_level',
-            'registed_at',
-            'smart_pot'
+            'registed_at'
         )
 
 #Modelos para las operaciones con los modelos
 class SmartPotCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SmartPot
-        fields = ['pot_name',
+        fields = [  'serial_number',
+                    'pot_name',
                     'ubication',
                     'updated_at',
                     'size',
-                    'status',
                     'plant']
         extra_kwargs = {'plant': {'write_only': True}}  # El ID de la planta se envía en la creación
 
