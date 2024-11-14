@@ -1,6 +1,7 @@
 from django.db import models
 from plants.models import Plant
 from users.models import UserProfile
+from django.utils import timezone
 
 # Create your models here.
 
@@ -53,3 +54,21 @@ class Configurations(models.Model):
    smartpot=models.ForeignKey(SmartPot, related_name='smartpot', on_delete=models.CASCADE)
    plant=models.ForeignKey(Plant, related_name='plant', on_delete=models.CASCADE)
 
+class Alert(models.Model):
+    class AlertType(models.TextChoices):
+        WATHERING_EVENT = 'eventoRiego', 'Evento de Riego'
+        NULL_DANGER = 'peligroNulo', 'Peligro Nulo'
+        MODERATE_DANGER = 'peligroModerado', 'Peligro Moderado'
+        HIGH_DANGER = 'peligroAlto', 'Peligro Alto'
+
+    alert_type = models.CharField(
+        max_length=20,
+        choices=AlertType.choices,
+        default=AlertType.NULL_DANGER,
+    )
+    alert_content = models.TextField()
+    create_time = models.DateTimeField(default=timezone.now)
+    smartpot = models.ForeignKey(SmartPot, on_delete=models.CASCADE, related_name='alerts')
+
+    def __str__(self):
+        return f"{self.alert_type} - {self.alert_content[:30]}"

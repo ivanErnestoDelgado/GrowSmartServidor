@@ -1,11 +1,12 @@
 from rest_framework import generics,status
 from rest_framework.permissions import IsAuthenticated
 from .models import *
-from .serializers import SmartPotCreateSerializer,SmartPotSerializer,SensorsDataSerializer,ConfigurationSerializer,WateringEventSerializer
+from .serializers import *
 from users.models import UserProfile
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from .functions import *
+from rest_framework.views import APIView
 
 class SmartPotCreateView(generics.CreateAPIView):
     serializer_class = SmartPotCreateSerializer
@@ -126,3 +127,16 @@ class WateringEventListView(generics.ListAPIView):
     def get_queryset(self):
         smart_pot_id = self.kwargs['pk']
         return WateringEvent.objects.filter(smart_pot__id=smart_pot_id, smart_pot__user_profile=UserProfile.objects.get(user=self.request.user))
+    
+class SmartPotAlertsView(APIView):
+    permission_classes = [IsAuthenticated]  # Requiere autenticación
+
+    def get(self, request, smartpot_id):
+        try:
+            # Filtra el SmartPot por ID y verifica que pertenezca al usuario autenticado
+            smartpot = SmartPot.objects.get(id=smartpot_id, user_profile=UserProfile.objects.get(user=self.request.user))
+            alerts = Alert.objects.filter(smartpot=smartpot)
+            serializer = AlertSerializer(alerts, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except SmartPot.DoesNotExist:
+            return Response({"error": "SmartPot not found or access denied"}, status=status.HTTP_404_NOT_FOUND)

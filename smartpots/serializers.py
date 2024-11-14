@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Configurations,SensorsData,SmartPot,WateringEvent
+from .models import *
 from plants.serializers import PlantSerializer
 #Serializador de los modelos
 class ConfigurationSerializer(serializers.ModelSerializer):
@@ -68,3 +68,8 @@ class SmartPotCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         # Usamos el `SmartPotSerializer` para la representación final
         return SmartPotSerializer(instance).data
+    
+class AlertSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alert
+        fields = ['alert_type', 'alert_content', 'create_time', 'smartpot']

@@ -12,4 +12,5 @@ urlpatterns = [
     # Riego automático
     path('api/smartpots/<int:pk>/watering/', WateringEventListView.as_view(), name='watering_event_list'),  # GET para historial
     path('api/smartpots/<int:pk>/watering/add/', WateringEventCreateView.as_view(), name='watering_event_create'),  # POST para registrar evento
+    path('smartpots/<int:smartpot_id>/alerts/', SmartPotAlertsView.as_view(), name='smartpot-alerts'),
 ]
