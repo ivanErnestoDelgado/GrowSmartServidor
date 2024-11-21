@@ -54,16 +54,22 @@ class SensorsDataCreateView(generics.CreateAPIView):
         smart_pot_id = self.kwargs['pk']
         smart_pot = SmartPot.objects.get(id=smart_pot_id, user_profile=UserProfile.objects.get(user=self.request.user))  # Verifica que la maceta pertenezca al usuario
         sensor_data=serializer.save(smart_pot=smart_pot)
-
         smart_pot = sensor_data.smart_pot
         plant = smart_pot.plant
 
         # Se llama a una funcion que retorna la cantidad de limites que se sobrepasaron comparandolo con los datos de los sensores y la planta
-        breaked_limits_count = count_breaked_limits(sensor_data, plant)
-
+        breaked_limits = find_breaked_limits(sensor_data, plant)
+        
+        print(breaked_limits.count)
+        obtained_smartpot_status=evaluate_plant_status(len(breaked_limits))
+        print(obtained_smartpot_status)
         # Actualiza el estado de la maceta basado en el número de parámetros fuera de los límites
-        smart_pot.status=evaluate_plant_status(breaked_limits_count)
+        smart_pot.status=obtained_smartpot_status
 
+        choosed_alert_type=choose_alert_type_from_status_choices(obtained_smartpot_status)
+        generated_alert_message=obtain_alert_message(choosed_alert_type,breaked_limits)
+        
+        Alert.objects.create(alert_type=choosed_alert_type,alert_content=generated_alert_message,smartpot=smart_pot)
         smart_pot.save()
 
         

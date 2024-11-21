@@ -72,4 +72,4 @@ class SmartPotCreateSerializer(serializers.ModelSerializer):
 class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
-        fields = ['alert_type', 'alert_content', 'create_time', 'smartpot']
+        fields = ['id','alert_type', 'alert_content', 'create_time', 'smartpot']

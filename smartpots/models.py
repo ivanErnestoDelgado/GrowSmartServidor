@@ -55,19 +55,19 @@ class Configurations(models.Model):
    plant=models.ForeignKey(Plant, related_name='plant', on_delete=models.CASCADE)
 
 class Alert(models.Model):
-    class AlertType(models.TextChoices):
+    class Type(models.TextChoices):
         WATHERING_EVENT = 'eventoRiego', 'Evento de Riego'
-        NULL_DANGER = 'peligroNulo', 'Peligro Nulo'
+        OUT_OF_DANGER = 'peligroNulo', 'Peligro Nulo'
         MODERATE_DANGER = 'peligroModerado', 'Peligro Moderado'
         HIGH_DANGER = 'peligroAlto', 'Peligro Alto'
 
     alert_type = models.CharField(
         max_length=20,
-        choices=AlertType.choices,
-        default=AlertType.NULL_DANGER,
+        choices=Type.choices,
+        default=Type.OUT_OF_DANGER,
     )
     alert_content = models.TextField()
-    create_time = models.DateTimeField(default=timezone.now)
+    create_time = models.DateTimeField(auto_now=True)
     smartpot = models.ForeignKey(SmartPot, on_delete=models.CASCADE, related_name='alerts')
 
     def __str__(self):
