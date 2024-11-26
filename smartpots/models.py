@@ -47,10 +47,10 @@ class Configurations(models.Model):
    maximun_temperature = models.DecimalField(max_digits=5, decimal_places=2)  # Temperatura maxima
    minimun_temperature = models.DecimalField(max_digits=5, decimal_places=2,)  # Temperatura minima
    maximun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad maximo
-   minumun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad minimo
+   minimun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad minimo
    maximun_ligth_level=models.PositiveIntegerField() # Nivel de luz maximo
    minimun_ligth_level=models.PositiveIntegerField()   # Nivel de humedad minimo
-   notifications_is_activated=models.BooleanField()
+   notifications_is_activated=models.BooleanField(default=True)
    smartpot=models.ForeignKey(SmartPot, related_name='smartpot', on_delete=models.CASCADE)
    plant=models.ForeignKey(Plant, related_name='plant', on_delete=models.CASCADE)
 

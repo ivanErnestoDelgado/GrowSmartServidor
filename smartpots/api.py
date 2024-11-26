@@ -13,7 +13,20 @@ class SmartPotCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user_profile=UserProfile.objects.get(user=self.request.user))  # Asocia la maceta al usuario autenticado
+        smart_pot=serializer.save(user_profile=UserProfile.objects.get(user=self.request.user))  # Asocia la maceta al usuario autenticado
+        obtained_plant=smart_pot.plant
+
+        Configurations.objects.create(
+            maximun_temperature=obtained_plant.maximun_temperature,
+            minimun_temperature=obtained_plant.minimun_temperature,
+            maximun_humidity=obtained_plant.maximun_humidity,
+            minimun_humidity=obtained_plant.minimun_humidity,
+            maximun_ligth_level=obtained_plant.maximun_ligth_level,
+            minimun_ligth_level=obtained_plant.minimun_ligth_level,
+            smartpot=smart_pot,
+            plant=obtained_plant
+        )
+
 
 
 class UserSmartPotListView(generics.ListAPIView):
