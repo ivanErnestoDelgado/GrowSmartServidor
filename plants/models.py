@@ -11,7 +11,7 @@ class Plant(models.Model):
     maximun_temperature = models.DecimalField(max_digits=5, decimal_places=2)  # Temperatura maxima
     minimun_temperature = models.DecimalField(max_digits=5, decimal_places=2,)  # Temperatura minima
     maximun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad maximo
-    minumun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad minimo
+    minimun_humidity = models.DecimalField(max_digits=5, decimal_places=2)  # Nivel de humedad minimo
     maximun_ligth_level=models.PositiveIntegerField() # Nivel de luz maximo
     minimun_ligth_level=models.PositiveIntegerField()   # Nivel de luz minimo
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,7 +27,7 @@ class Plant(models.Model):
         return self.obtain_data_status(sensor_temperature_data,self.minimun_temperature,self.maximun_temperature)
     
     def evaluate_humidity_data(self, sensor_humidity_data):
-        return self.obtain_data_status(sensor_humidity_data,self.minumun_humidity,self.maximun_humidity)
+        return self.obtain_data_status(sensor_humidity_data,self.minimun_humidity,self.maximun_humidity)
     
     def obtain_data_status(self,sensor_data,minimun,maximun):
         if(sensor_data<minimun):

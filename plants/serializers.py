@@ -11,7 +11,7 @@ class PlantSerializer(serializers.ModelSerializer):
             'maximun_temperature',
             'minimun_temperature',
             'maximun_humidity',
-            'minumun_humidity',
+            'minimun_humidity',
             'maximun_ligth_level',
             'minimun_ligth_level',
             'created_at',
