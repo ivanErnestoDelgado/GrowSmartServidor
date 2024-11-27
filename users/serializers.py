@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from .models import UserProfile
 from django.contrib.auth.models import User
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from random import choice
+import string
+import socket
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,3 +50,35 @@ class RegisterSerializer(serializers.ModelSerializer):
         UserProfile.objects.create(user=user, **profile_data)
 
         return user
+    
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    generated_password = ''.join(choice(string.ascii_letters + string.digits) for _ in range(8))
+    def validate_email(self, value):
+        try:
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No existe un usuario con este correo electrónico.")
+        return value
+
+    def save(self):
+        email = self.validated_data['email']
+        user = User.objects.get(email=email)
+        user.set_password(self.generated_password)
+        user.save()
+
+            # Enviar el correo (puedes personalizar el contenido)
+        user.email_user(
+            subject="Restablecimiento de contraseña",
+            message=f"""
+            Hola {user.username},
+
+            Tu nueva contraseña es: {self.generated_password}
+
+            Por favor, cámbiala después de iniciar sesión.
+
+            Saludos,
+            El equipo de soporte
+            """)
+

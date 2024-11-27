@@ -1,5 +1,5 @@
 from rest_framework import generics,status
-from .serializers import RegisterSerializer,UserSerializer
+from .serializers import *
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
@@ -38,3 +38,11 @@ class CustomAuthToken(APIView):
             })
         else:
             return Response({"error": "Credenciales inválidas"}, status=status.HTTP_400_BAD_REQUEST)
+        
+class PasswordResetView(APIView):
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "Se ha enviado un correo para restablecer la contraseña."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
