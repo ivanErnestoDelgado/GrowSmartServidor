@@ -18,8 +18,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['user', 'location', 'phone_number', 'bio', 'created_at']
-        read_only_fields = ['created_at']  # 'created_at' solo es de lectura
-
+        read_only_fields = ['created_at']  # 'created_at' solo es de lectura  
+        
 class RegisterSerializer(serializers.ModelSerializer):
     # Campos adicionales para la información del perfil
     location = serializers.CharField(required=False)
