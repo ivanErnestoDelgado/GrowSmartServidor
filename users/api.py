@@ -3,7 +3,7 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth import authenticate
 
 class RegisterView(generics.CreateAPIView):
@@ -45,4 +45,20 @@ class PasswordResetView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"detail": "Se ha enviado un correo para restablecer la contraseña."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]  # Asegurar que solo usuarios autenticados accedan
+
+    def put(self, request, *args, **kwargs):
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Perfil no encontrado o no autorizado."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileSerializer(instance=profile, data=request.data, partial=True)  # Permitir actualizaciones parciales
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

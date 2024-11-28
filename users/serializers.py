@@ -5,20 +5,37 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from random import choice
 import string
-import socket
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']  #
+        fields = ['id', 'username', 'email']
+        read_only_fields=['id']
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)  # Serializamos el campo 'user' utilizando un serializer aparte
+    user = UserSerializer()  # Serializamos el campo 'user' utilizando un serializer aparte
 
     class Meta:
         model = UserProfile
         fields = ['user', 'location', 'phone_number', 'bio', 'created_at']
-        read_only_fields = ['created_at']  # 'created_at' solo es de lectura  
+        read_only_fields = ['created_at']  # 'created_at' solo es de lectura
+    def update(self, instance, validated_data):
+            # Extraer los datos de 'user'
+        user_data = validated_data.pop('user', None)
+
+            # Actualizar los datos del modelo User
+        if user_data:
+            user_instance = instance.user  # Relación OneToOne con User
+            for attr, value in user_data.items():
+                setattr(user_instance, attr, value)  # Actualiza los atributos del modelo User
+            user_instance.save()
+
+            # Actualizar los datos del modelo UserProfile
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance  
         
 class RegisterSerializer(serializers.ModelSerializer):
     # Campos adicionales para la información del perfil
