@@ -47,7 +47,7 @@ class PlantRecomendation(models.Model):
         choices=RecommendationType.choices,
         default=RecommendationType.POSITIVE
     )
-    recommendation = models.CharField(max_length=255)
+    content = models.CharField(max_length=255)
     plant = models.ForeignKey(Plant, related_name='recommendations', on_delete=models.CASCADE)
     def __str__(self):
-        return f"{self.type} - {self.recommendation}"  # Muestra el tipo y los primeros caracteres de la recomendación
+        return f"{self.type} - {self.content}"  # Muestra el tipo y los primeros caracteres de la recomendación
