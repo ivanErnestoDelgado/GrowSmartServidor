@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth import authenticate
+from .models import FCMToken
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -75,3 +76,22 @@ class ChangePasswordView(APIView):
             return Response({"message": "La contraseña ha sido cambiada exitosamente."}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SaveFCMTokenView(APIView):
+    def post(self, request):
+        fcm_token = request.data.get('fcm_token')
+
+        if not fcm_token:
+            return Response({"error": "El token FCM es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            token, created = FCMToken.objects.update_or_create(
+                token=fcm_token,
+                defaults={'user': None},
+            )
+            if created:
+                return Response({"message": "Token registrado exitosamente."}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"message": "Token actualizado exitosamente."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Error al guardar el token: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
