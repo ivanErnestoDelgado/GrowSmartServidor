@@ -78,6 +78,7 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SaveFCMTokenView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         fcm_token = request.data.get('fcm_token')
 
@@ -87,7 +88,7 @@ class SaveFCMTokenView(APIView):
         try:
             token, created = FCMToken.objects.update_or_create(
                 token=fcm_token,
-                defaults={'user': None},
+                user=request.user,
             )
             if created:
                 return Response({"message": "Token registrado exitosamente."}, status=status.HTTP_201_CREATED)

@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from .models import UserProfile
 from django.contrib.auth.models import User
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
 from random import choice
 import string
 

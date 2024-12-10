@@ -37,7 +37,7 @@ class WateringEvent(models.Model):
 
 class SensorsData(models.Model):
    floor_humidity=models.DecimalField(max_digits=5, decimal_places=2)
-   temperature=models.PositiveIntegerField()
+   temperature=models.DecimalField(max_digits=5, decimal_places=2)
    light_level=models.PositiveIntegerField()
    water_level=models.PositiveIntegerField()
    registed_at=models.DateTimeField(auto_now=True)

@@ -1,5 +1,4 @@
 from smartpots.models import *
-from enum import Enum
 
 alertTypes_from_smartpots_status={
             SmartPot.GOOD: Alert.Type.OUT_OF_DANGER,
