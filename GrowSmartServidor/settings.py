@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework.authtoken',
+    'corsheaders',
     'plants',
     'rest_framework',
     'users',
@@ -53,7 +54,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+#La wea del CORS la añadi para probar la app del flutter en el navegador ya que no me dejaba ejecutar la app en celular
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'GrowSmartServidor.urls'
 
