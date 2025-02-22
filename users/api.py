@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth import authenticate
-from .models import FCMToken
+from fcm_django.models import FCMDevice
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -86,9 +86,9 @@ class SaveFCMTokenView(APIView):
             return Response({"error": "El token FCM es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            token, created = FCMToken.objects.update_or_create(
-                token=fcm_token,
-                user=request.user,
+            device, created = FCMDevice.objects.update_or_create(
+            registration_id=fcm_token,
+            defaults={"type": "android"}
             )
             if created:
                 return Response({"message": "Token registrado exitosamente."}, status=status.HTTP_201_CREATED)
