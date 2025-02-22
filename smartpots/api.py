@@ -3,12 +3,13 @@ from rest_framework import generics,status
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
-from users.models import UserProfile, FCMToken
+from users.models import UserProfile
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from .functions import *
 from rest_framework.views import APIView
 from utils import notifications
+from fcm_django.models import FCMDevice 
 
 class SmartPotCreateView(generics.CreateAPIView):
     serializer_class = SmartPotCreateSerializer
@@ -82,11 +83,8 @@ class SensorsDataCreateView(generics.CreateAPIView):
         choosed_alert_type=choose_alert_type_from_status_choices(obtained_smartpot_status)
         generated_alert_message=obtain_alert_message(choosed_alert_type,breaked_limits)
         
-        if choosed_alert_type is not Alert.Type.OUT_OF_DANGER:
-            obtained_fmc_token=FCMToken.objects.get(user=obtained_user)
-            message_title=f"Alerta de Maceta: {smart_pot.pot_name}"
-            notifications.enviar_notificacion(fcm_token=obtained_fmc_token.token,titulo=message_title, mensaje=generated_alert_message)
-        
+       #PONER ALERTA
+       
         Alert.objects.create(alert_type=choosed_alert_type,alert_content=generated_alert_message,smartpot=smart_pot)
         smart_pot.save()
 
@@ -149,12 +147,7 @@ class WateringEventCreateView(generics.CreateAPIView):
         alert_message=obtain_alert_message(obtained_alert_type, [])
         Alert.objects.create(alert_type=obtained_alert_type,alert_content=alert_message,smartpot=smart_pot)
 
-        obtained_fmc_token=FCMToken.objects.get(user=obtained_user)
-        message_title=f'Maceta {smart_pot.pot_name}'
-        message_body=alert_message
-
-        notifications.enviar_notificacion(fcm_token=obtained_fmc_token.token,titulo=message_title,mensaje=message_body)
-
+       #WEA DE NOTIFICACIÓN
 
 class WateringEventListView(generics.ListAPIView):
     serializer_class = WateringEventSerializer
