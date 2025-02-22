@@ -1,2 +1,0 @@
-HOST_MAIL=''
-HOST_PASSWORD=''

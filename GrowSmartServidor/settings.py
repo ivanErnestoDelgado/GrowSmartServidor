@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from .KEYS import *
+from utils.KEYS import *
+import firebase_admin
+from firebase_admin import credentials
+import utils.KEYS as KEYS
+import os
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,7 +48,8 @@ INSTALLED_APPS = [
     'plants',
     'rest_framework',
     'users',
-    'smartpots'
+    'smartpots',
+    'fcm_django',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +62,25 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
+
+#FIREBASE CONFIGS
+
+FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, KEYS.FIREBASE_ADMIN_SDK_NAME)
+
+if os.path.exists(FIREBASE_CREDENTIALS_PATH):
+    with open(FIREBASE_CREDENTIALS_PATH) as f:
+        FIREBASE_CREDENTIALS = json.load(f)
+else:
+    FIREBASE_CREDENTIALS = {}
+
+FCM_DJANGO_SETTINGS = {
+    "FCM_SERVER_KEY": FIREBASE_CREDENTIALS.get("private_key_id", ""), #PONER CLAVE
+    "ONE_DEVICE_PER_USER": False,  # Permite múltiples dispositivos por usuario
+    "DELETE_INACTIVE_DEVICES": True,  # Elimina dispositivos inactivos automáticamente
+}
+
+
+#CORS CONFIGS
 #La wea del CORS la añadi para probar la app del flutter en el navegador ya que no me dejaba ejecutar la app en celular
 CORS_ALLOW_ALL_ORIGINS = True
 
