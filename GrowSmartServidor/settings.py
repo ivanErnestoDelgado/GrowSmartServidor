@@ -73,6 +73,10 @@ if os.path.exists(FIREBASE_CREDENTIALS_PATH):
 else:
     FIREBASE_CREDENTIALS = {}
 
+if not firebase_admin._apps:
+    cred = credentials.Certificate(FIREBASE_ADMIN_SDK_NAME)
+    firebase_admin.initialize_app(cred)
+
 FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": FIREBASE_CREDENTIALS.get("private_key_id", ""), #PONER CLAVE
     "ONE_DEVICE_PER_USER": False,  # Permite múltiples dispositivos por usuario
