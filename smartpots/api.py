@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from .functions import *
 from rest_framework.views import APIView
 from utils import notifications
-from fcm_django.models import FCMDevice 
+from fcm_django.models import FCMDevice
+from firebase_admin.messaging import Message, Notification 
 
 class SmartPotCreateView(generics.CreateAPIView):
     serializer_class = SmartPotCreateSerializer
@@ -166,6 +167,20 @@ class SmartPotAlertsView(APIView):
             smartpot = SmartPot.objects.get(id=smartpot_id, user_profile=UserProfile.objects.get(user=self.request.user))
             alerts = Alert.objects.filter(smartpot=smartpot)
             serializer = AlertSerializer(alerts, many=True)
+
+            device = FCMDevice.objects.first()
+
+            if device:
+                message = Message(
+                    notification=Notification(
+                        title="Prueba",
+                        body="¡Hola desde Django con FCM!"
+                    )
+                )
+                device.send_message(message)
+            else:
+                print("No hay dispositivos registrados")
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         except SmartPot.DoesNotExist:
             return Response({"error": "SmartPot not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
