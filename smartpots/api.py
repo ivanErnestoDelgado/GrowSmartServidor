@@ -9,8 +9,7 @@ from rest_framework.response import Response
 from .functions import *
 from rest_framework.views import APIView
 from utils import notifications
-from fcm_django.models import FCMDevice
-from firebase_admin.messaging import Message, Notification 
+from fcm_django.models import FCMDevice 
 
 class SmartPotCreateView(generics.CreateAPIView):
     serializer_class = SmartPotCreateSerializer
@@ -74,6 +73,9 @@ class SensorsDataCreateView(generics.CreateAPIView):
         smart_pot = sensor_data.smart_pot
         plant = smart_pot.plant
         obtained_user=smart_pot.user_profile.user
+
+        user_devices=FCMDevice.objects.filter(user=obtained_user)
+        print(len(user_devices))
         # Se llama a una funcion que retorna la cantidad de limites que se sobrepasaron comparandolo con los datos de los sensores y la planta
         breaked_limits = find_breaked_limits(sensor_data, plant)
         
@@ -84,7 +86,11 @@ class SensorsDataCreateView(generics.CreateAPIView):
         choosed_alert_type=choose_alert_type_from_status_choices(obtained_smartpot_status)
         generated_alert_message=obtain_alert_message(choosed_alert_type,breaked_limits)
         
-       #PONER ALERTA
+        if obtained_smartpot_status is not Alert.Type.OUT_OF_DANGER and user_devices.exists():
+            pot_name=smart_pot.pot_name
+            message_title=f"Alerta en maceta: {pot_name}"
+            response=notifications.send_push_notification(title=message_title,body=generated_alert_message,devices=user_devices)
+
        
         Alert.objects.create(alert_type=choosed_alert_type,alert_content=generated_alert_message,smartpot=smart_pot)
         smart_pot.save()
@@ -168,18 +174,6 @@ class SmartPotAlertsView(APIView):
             alerts = Alert.objects.filter(smartpot=smartpot)
             serializer = AlertSerializer(alerts, many=True)
 
-            device = FCMDevice.objects.first()
-
-            if device:
-                message = Message(
-                    notification=Notification(
-                        title="Prueba",
-                        body="¡Hola desde Django con FCM!"
-                    )
-                )
-                device.send_message(message)
-            else:
-                print("No hay dispositivos registrados")
             
             return Response(serializer.data, status=status.HTTP_200_OK)
         except SmartPot.DoesNotExist:
