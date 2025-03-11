@@ -1,11 +1,32 @@
-from pyfcm import FCMNotification
+from firebase_admin.messaging import Message, Notification,MulticastMessage,send_multicast,send
 
-push_service = FCMNotification('BOuxi-7CfAe91Ww9RMPHMOjkUXHdhUZp_tH8XMowdFbfJNrjhHuQ2D7f3eOwxsBgabFbiQKrkdxuglVltX0B8Kw',project_id='growsmart-6debd')
+def send_push_notification(title,body,devices):
+    number_of_devices=len(devices)
+    tokens = [device.registration_id for device in devices if device.registration_id]
 
-def enviar_notificacion(fcm_token, titulo, mensaje):
-    result = push_service.notify_single_device(
-        registration_id=fcm_token,
-        message_title=titulo,
-        message_body=mensaje,
+    if number_of_devices==1:
+        maked_message=make_unicast_message(title=title,body=body,token=tokens[0])
+        return send(message=maked_message)
+    else:
+        maked_message=make_multicast_message(title=title,body=body,tokens=tokens)
+        return send_multicast(maked_message)
+    
+    
+
+def make_multicast_message(title,body,tokens):
+    return MulticastMessage(
+        notification=Notification(
+            title=title,
+            body=body
+        ),
+        tokens=tokens
     )
-    return result
+
+def make_unicast_message(title,body,token):
+    return Message(
+        notification=Notification(
+            title=title,
+            body=body
+        ),
+        token=token
+    )
