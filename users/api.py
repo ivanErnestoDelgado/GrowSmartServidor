@@ -81,12 +81,13 @@ class SaveFCMTokenView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         fcm_token = request.data.get('fcm_token')
-
+        user=self.request.user
         if not fcm_token:
             return Response({"error": "El token FCM es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             device, created = FCMDevice.objects.update_or_create(
+            user=user,
             registration_id=fcm_token,
             defaults={"type": "android"}
             )
@@ -95,4 +96,5 @@ class SaveFCMTokenView(APIView):
             else:
                 return Response({"message": "Token actualizado exitosamente."}, status=status.HTTP_200_OK)
         except Exception as e:
+            print(e)
             return Response({"error": f"Error al guardar el token: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
