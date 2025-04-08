@@ -75,7 +75,6 @@ class SensorsDataCreateView(generics.CreateAPIView):
         obtained_user=smart_pot.user_profile.user
 
         user_devices=FCMDevice.objects.filter(user=obtained_user)
-        print(len(user_devices))
         # Se llama a una funcion que retorna la cantidad de limites que se sobrepasaron comparandolo con los datos de los sensores y la planta
         breaked_limits = find_breaked_limits(sensor_data, plant)
         
@@ -152,9 +151,17 @@ class WateringEventCreateView(generics.CreateAPIView):
 
         obtained_alert_type=Alert.Type.WATHERING_EVENT
         alert_message=obtain_alert_message(obtained_alert_type, [])
+
+        user_devices=FCMDevice.objects.filter(user=obtained_user)
+
+        if user_devices.exists():
+            message_title="Alerta de riego"
+            message_body=f"{alert_message}: {smart_pot.pot_name}"
+            response=notifications.send_push_notification(title=message_title,body=message_body,devices=user_devices)
+
+
         Alert.objects.create(alert_type=obtained_alert_type,alert_content=alert_message,smartpot=smart_pot)
 
-       #WEA DE NOTIFICACIÓN
 
 class WateringEventListView(generics.ListAPIView):
     serializer_class = WateringEventSerializer
