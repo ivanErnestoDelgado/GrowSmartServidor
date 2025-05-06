@@ -10,6 +10,8 @@ from .functions import *
 from rest_framework.views import APIView
 from utils import notifications
 from fcm_django.models import FCMDevice 
+from django.core.cache import cache
+from datetime import timedelta
 
 class SmartPotCreateView(generics.CreateAPIView):
     serializer_class = SmartPotCreateSerializer
@@ -86,10 +88,16 @@ class SensorsDataCreateView(generics.CreateAPIView):
         generated_alert_message=obtain_alert_message(choosed_alert_type,breaked_limits)
         
         if obtained_smartpot_status is not Alert.Type.OUT_OF_DANGER and user_devices.exists():
-            pot_name=smart_pot.pot_name
-            message_title=f"Alerta en maceta: {pot_name}"
-            response=notifications.send_push_notification(title=message_title,body=generated_alert_message,devices=user_devices)
+            cache_key = f'notificacion_maceta_{smart_pot_id}'
 
+            if not cache.get(cache_key):
+                #Envio de notificacion push
+                pot_name=smart_pot.pot_name
+                message_title=f"Alerta en maceta: {pot_name}"
+                response=notifications.send_push_notification(title=message_title,body=generated_alert_message,devices=user_devices)
+                
+                #Creación de cache para limitar el tiempo de envio entre notificaciones push
+                cache.set(cache_key, True, timeout=60)
        
         Alert.objects.create(alert_type=choosed_alert_type,alert_content=generated_alert_message,smartpot=smart_pot)
         smart_pot.save()
