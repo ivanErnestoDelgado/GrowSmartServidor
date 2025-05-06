@@ -11,12 +11,24 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from utils.KEYS import *
 import firebase_admin
 from firebase_admin import credentials
-import utils.KEYS as KEYS
 import os
 import json
+from pathlib import Path
+from dotenv import load_dotenv
+
+#CARGA DE VARIABLES DE ENTORNO
+env_path=Path(__file__).resolve().parent.parent / 'KEYS.env'
+load_dotenv(dotenv_path=env_path)
+
+#CREDENCIALES SERVIDOR DE CORREO
+HOST_MAIL=os.getenv('HOST_MAIL')
+HOST_PASSWORD=os.getenv('HOST_PASSWORD')
+
+#RUTA CREDENCIALES DE FIREBASE
+FIREBASE_ADMIN_SDK_NAME=os.getenv('FIREBASE_ADMIN_SDK_NAME')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,7 +77,7 @@ MIDDLEWARE = [
 
 #FIREBASE CONFIGS
 
-FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, KEYS.FIREBASE_ADMIN_SDK_NAME)
+FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, FIREBASE_ADMIN_SDK_NAME)
 
 if os.path.exists(FIREBASE_CREDENTIALS_PATH):
     with open(FIREBASE_CREDENTIALS_PATH) as f:
@@ -74,7 +86,7 @@ else:
     FIREBASE_CREDENTIALS = {}
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate(FIREBASE_ADMIN_SDK_NAME)
+    cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
     firebase_admin.initialize_app(cred)
 
 FCM_DJANGO_SETTINGS = {
