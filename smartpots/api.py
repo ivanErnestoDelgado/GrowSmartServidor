@@ -93,11 +93,11 @@ class SensorsDataCreateView(generics.CreateAPIView):
             if not cache.get(cache_key):
                 #Envio de notificacion push
                 pot_name=smart_pot.pot_name
-                message_title=f"Alerta en maceta: {pot_name}"
+                message_title=f"Alerta en modulo: {pot_name}"
                 response=notifications.send_push_notification(title=message_title,body=generated_alert_message,devices=user_devices)
                 
                 #Creación de cache para limitar el tiempo de envio entre notificaciones push
-                cache.set(cache_key, True, timeout=60)
+                cache.set(cache_key, True, timeout=30)
        
         Alert.objects.create(alert_type=choosed_alert_type,alert_content=generated_alert_message,smartpot=smart_pot)
         smart_pot.save()

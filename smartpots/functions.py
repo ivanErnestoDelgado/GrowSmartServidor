@@ -50,9 +50,9 @@ def choose_alert_type_from_status_choices(status):
 def obtain_alert_message(alert_type,out_of_limits_sensors):
     match alert_type:
          case Alert.Type.OUT_OF_DANGER:
-              return "Maceta fuera de peligro"
+              return "Modulo fuera de peligro"
          case Alert.Type.WATHERING_EVENT:
-              return "Maceta regada"
+              return "Modulo regado"
          case alert_type if is_on_danger(alert_type):
               return "Los siguientes parametros estan fuera de limite: "+", ".join(out_of_limits_sensors)
 
